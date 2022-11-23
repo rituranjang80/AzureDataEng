@@ -1,5 +1,5 @@
 {
-	"name": "Pipeline 1",
+	"name": "copy data source to sink",
 	"properties": {
 		"activities": [
 			{
