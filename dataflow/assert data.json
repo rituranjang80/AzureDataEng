@@ -32,7 +32,8 @@
 				"     allowSchemaDrift: false,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> Employees",
-				"Employees assert(expectTrue(!isNull(toDate(doj,'yyyymmdd')), false, 'assertdoj', null, 'here we are checking doj')) ~> assert1"
+				"Employees assert(expectTrue(!isNull(toDate(doj,'yyyymmdd')), false, 'assertdoj', null, 'here we are checking doj'),",
+				"     expectUnique({emp id}, false, 'empid', null, 'valid empid')) ~> assert1"
 			]
 		}
 	}
