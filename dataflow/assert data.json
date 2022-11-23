@@ -1,0 +1,39 @@
+{
+	"name": "assert data",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText5",
+						"type": "DatasetReference"
+					},
+					"name": "Employees"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "assert1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     parameter1 as string",
+				"}",
+				"source(output(",
+				"          {emp id} as string,",
+				"          {first name} as string,",
+				"          {last name} as string,",
+				"          doj as string,",
+				"          depid as string",
+				"     ),",
+				"     allowSchemaDrift: false,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Employees",
+				"Employees assert(expectTrue(!isNull(toDate(doj,'yyyymmdd')), false, 'assertdoj', null, 'here we are checking doj')) ~> assert1"
+			]
+		}
+	}
+}
