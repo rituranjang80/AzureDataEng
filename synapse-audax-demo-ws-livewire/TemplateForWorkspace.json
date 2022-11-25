@@ -262,11 +262,17 @@
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "apachesparkpool",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": null,
 							"conf": {
 								"spark.dynamicAllocation.enabled": null,
 								"spark.dynamicAllocation.minExecutors": null,
 								"spark.dynamicAllocation.maxExecutors": null
 							},
+							"driverSize": null,
 							"numExecutors": null
 						}
 					}
@@ -284,7 +290,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/notebooks/parameterPipeline')]"
+				"[concat(variables('workspaceId'), '/notebooks/parameterPipeline')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/apachesparkpool')]"
 			]
 		},
 		{
@@ -1254,6 +1261,10 @@
 			"properties": {
 				"nbformat": 4,
 				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "apachesparkpool",
+					"type": "BigDataPoolReference"
+				},
 				"sessionProperties": {
 					"driverMemory": "28g",
 					"driverCores": 4,
@@ -1264,7 +1275,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1ddecd64-5f97-4686-be27-c618e33685df"
+						"spark.autotune.trackingId": "8e5a393d-8b05-449d-8096-acf077edae61"
 					}
 				},
 				"metadata": {
@@ -1276,6 +1287,20 @@
 					},
 					"language_info": {
 						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/422cf0b3-8d06-4fc7-8903-2cb72dd00d8f/resourceGroups/Livewire/providers/Microsoft.Synapse/workspaces/synapse-audax-demo-ws-livewire/bigDataPools/apachesparkpool",
+						"name": "apachesparkpool",
+						"type": "Spark",
+						"endpoint": "https://synapse-audax-demo-ws-livewire.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/apachesparkpool",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1385,7 +1410,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "28ae33f2-759f-4876-b314-e9a30fa44a53"
+						"spark.autotune.trackingId": "2ce91630-1da0-48df-86cc-ba1488326d57"
 					}
 				},
 				"metadata": {
@@ -1410,8 +1435,7 @@
 						"sparkVersion": "3.2",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1444,11 +1468,12 @@
 						},
 						"source": [
 							"df = spark.read.csv(filepath)\r\n",
-							"df= df.repartition(1)\r\n",
+							"display(df)\r\n",
+							"# df= df.repartition(1)\r\n",
 							"\r\n",
-							"df.write.mode(\"overwrite\").csv(\"/test//CsvFiles4\")\r\n",
+							"# df.write.mode(\"overwrite\").csv(\"/test//CsvFiles4\")\r\n",
 							"\r\n",
-							"df.write.mode(\"overwrite\").toJSON(\"/test/csvtojson.json\")\r\n",
+							"# df.write.mode(\"overwrite\").toJSON(\"/test/csvtojson.json\")\r\n",
 							""
 						],
 						"outputs": [],
