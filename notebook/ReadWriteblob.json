@@ -1,0 +1,48 @@
+{
+	"name": "ReadWriteblob",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "1ddecd64-5f97-4686-be27-c618e33685df"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"df1=spark.read.load(path='abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/sales_data_sample.csv',format='csv')\r\n",
+					"df1= df1.repartition(1)\r\n",
+					"\r\n",
+					"df1.write.mode(\"overwrite\").csv(\"/sales_data_sample/CsvFiles4\")\r\n",
+					"df1.write.mode(\"overwrite\").parquet(\"/sales_data_sample/ParquetFiles4\")"
+				],
+				"execution_count": 3
+			}
+		]
+	}
+}
