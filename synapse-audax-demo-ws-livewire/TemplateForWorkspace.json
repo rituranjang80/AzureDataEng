@@ -278,7 +278,7 @@
 				"parameters": {
 					"filepath": {
 						"type": "string",
-						"defaultValue": "abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/CryptocurrencyPricesDatasets.csv"
+						"defaultValue": "abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/test/test.csv"
 					}
 				},
 				"annotations": []
@@ -1385,7 +1385,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a35cee69-36e5-4949-8801-c346f1744239"
+						"spark.autotune.trackingId": "1d80dfaf-3c56-4f33-81d0-cabb7482b997"
 					}
 				},
 				"metadata": {
@@ -1443,7 +1443,7 @@
 						},
 						"source": [
 							"df = spark.read.csv(filepath)\r\n",
-							"df.write.mode(\"overwrite\").toJSON(\"/tmp/json\")\r\n",
+							"df.write.mode(\"overwrite\").toJSON(\"/test/csvtojson.json\")\r\n",
 							""
 						],
 						"outputs": [],
