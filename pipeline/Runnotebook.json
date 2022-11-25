@@ -19,14 +19,20 @@
 						"referenceName": "parameterPipeline",
 						"type": "NotebookReference"
 					},
-					"snapshot": true
+					"snapshot": true,
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"numExecutors": null
 				}
 			}
 		],
 		"parameters": {
 			"filepath": {
 				"type": "string",
-				"defaultValue": "abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/CryptocurrencyPricesDatasets.csv"
+				"defaultValue": "abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/test/test.csv"
 			}
 		},
 		"annotations": []
