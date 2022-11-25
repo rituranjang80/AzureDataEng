@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2ce91630-1da0-48df-86cc-ba1488326d57"
+				"spark.autotune.trackingId": "93ae1723-adac-43a1-b3c3-8374532873e6"
 			}
 		},
 		"metadata": {
@@ -56,7 +56,7 @@
 					]
 				},
 				"source": [
-					"filepath='b'"
+					"filepath='a' #'abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/test/test.csv'"
 				],
 				"execution_count": 1
 			},
