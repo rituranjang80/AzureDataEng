@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "547d42d7-b73b-4e92-96a4-54523b643e4b"
+				"spark.autotune.trackingId": "8317b8dc-0527-492a-97dd-d0433ce4328c"
 			}
 		},
 		"metadata": {
@@ -50,8 +50,13 @@
 		"cells": [
 			{
 				"cell_type": "code",
+				"metadata": {
+					"tags": [
+						"parameters"
+					]
+				},
 				"source": [
-					"filepath='abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/CryptocurrencyPricesDatasets.csv'"
+					"filepath='b'"
 				],
 				"execution_count": 1
 			},
