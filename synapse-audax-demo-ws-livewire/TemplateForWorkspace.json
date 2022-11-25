@@ -1385,7 +1385,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1d80dfaf-3c56-4f33-81d0-cabb7482b997"
+						"spark.autotune.trackingId": "28ae33f2-759f-4876-b314-e9a30fa44a53"
 					}
 				},
 				"metadata": {
@@ -1410,7 +1410,8 @@
 						"sparkVersion": "3.2",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1443,6 +1444,10 @@
 						},
 						"source": [
 							"df = spark.read.csv(filepath)\r\n",
+							"df= df.repartition(1)\r\n",
+							"\r\n",
+							"df.write.mode(\"overwrite\").csv(\"/test//CsvFiles4\")\r\n",
+							"\r\n",
 							"df.write.mode(\"overwrite\").toJSON(\"/test/csvtojson.json\")\r\n",
 							""
 						],
