@@ -69,11 +69,13 @@
 				"          depid as string,",
 				"          depname as string",
 				"     ),",
+				"     partitionFileNames:['EmpDepData'],",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> output"
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> output"
 			]
 		}
 	}
