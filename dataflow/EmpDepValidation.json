@@ -19,7 +19,15 @@
 					"name": "Depdata"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Empdepvalidation",
+						"type": "DatasetReference"
+					},
+					"name": "output"
+				}
+			],
 			"transformations": [
 				{
 					"name": "assert1"
@@ -54,7 +62,18 @@
 				"     expectExists(Employeesdata@depid == Depdata@depid, false, 'assertDepexist')) ~> assert1",
 				"assert1 derive(isErrorRow = isError(),",
 				"          IsincorrectDeprow = hasError('assertempid')) ~> derivedColumn1",
-				"derivedColumn1 filter(isErrorRow == false()) ~> filterReqData"
+				"derivedColumn1 filter(isErrorRow == false()) ~> filterReqData",
+				"filterReqData sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          depid as string,",
+				"          depname as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> output"
 			]
 		}
 	}
