@@ -717,6 +717,131 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/Depdata')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "synapse-audax-demo-ws-livewire-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "depdata.csv",
+						"folderPath": "empfolder",
+						"fileSystem": "dldemofilesystem"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "depid",
+						"type": "String"
+					},
+					{
+						"name": "depname",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/synapse-audax-demo-ws-livewire-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Empdepvalidation')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "synapse-audax-demo-ws-livewire-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "empfolder",
+						"fileSystem": "dldemofilesystem"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "depid",
+						"type": "String"
+					},
+					{
+						"name": "depname",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/synapse-audax-demo-ws-livewire-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/EmployeesData')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "synapse-audax-demo-ws-livewire-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "empdata.csv",
+						"folderPath": "empfolder",
+						"fileSystem": "dldemofilesystem"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "emp id",
+						"type": "String"
+					},
+					{
+						"name": "first name",
+						"type": "String"
+					},
+					{
+						"name": "last name",
+						"type": "String"
+					},
+					{
+						"name": "doj",
+						"type": "String"
+					},
+					{
+						"name": "depid",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/synapse-audax-demo-ws-livewire-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/InputDQ')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -1186,6 +1311,93 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/EmpDepValidation')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "EmployeesData",
+								"type": "DatasetReference"
+							},
+							"name": "Employeesdata"
+						},
+						{
+							"dataset": {
+								"referenceName": "Depdata",
+								"type": "DatasetReference"
+							},
+							"name": "Depdata"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Empdepvalidation",
+								"type": "DatasetReference"
+							},
+							"name": "output"
+						}
+					],
+					"transformations": [
+						{
+							"name": "assert1"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "filterReqData"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          {emp id} as string,",
+						"          {first name} as string,",
+						"          {last name} as string,",
+						"          doj as string,",
+						"          depid as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Employeesdata",
+						"source(output(",
+						"          depid as string,",
+						"          depname as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Depdata",
+						"Employeesdata, Depdata assert(expectTrue(!isNull(toDate(doj,'yyyymmdd')), false, 'assertdoj'),",
+						"     expectUnique({emp id}, false, 'assertempid'),",
+						"     expectExists(Employeesdata@depid == Depdata@depid, false, 'assertDepexist')) ~> assert1",
+						"assert1 derive(isErrorRow = isError(),",
+						"          IsincorrectDeprow = hasError('assertempid')) ~> derivedColumn1",
+						"derivedColumn1 filter(isErrorRow == false()) ~> filterReqData",
+						"filterReqData sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          depid as string,",
+						"          depname as string",
+						"     ),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> output"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/EmployeesData')]",
+				"[concat(variables('workspaceId'), '/datasets/Depdata')]",
+				"[concat(variables('workspaceId'), '/datasets/Empdepvalidation')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
 			"type": "Microsoft.Synapse/workspaces/credentials",
 			"apiVersion": "2019-06-01-preview",
@@ -1410,7 +1622,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "2ce91630-1da0-48df-86cc-ba1488326d57"
+						"spark.autotune.trackingId": "93ae1723-adac-43a1-b3c3-8374532873e6"
 					}
 				},
 				"metadata": {
@@ -1448,7 +1660,7 @@
 							]
 						},
 						"source": [
-							"filepath='b'"
+							"filepath='a' #'abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/test/test.csv'"
 						],
 						"outputs": [],
 						"execution_count": 1
