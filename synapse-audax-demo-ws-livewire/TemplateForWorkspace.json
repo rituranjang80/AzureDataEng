@@ -121,6 +121,54 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/EmpDataPipeline')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "EmpdepData",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "EmpDepValidation",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Employeesdata": {},
+									"Depdata": {},
+									"output": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/EmpDepValidation')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/Emp_schema_ref')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -1383,11 +1431,13 @@
 						"          depid as string,",
 						"          depname as string",
 						"     ),",
+						"     partitionFileNames:['EmpDepData'],",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> output"
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> output"
 					]
 				}
 			},
