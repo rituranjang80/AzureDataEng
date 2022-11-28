@@ -1,0 +1,61 @@
+{
+	"name": "EmpDepValidation",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "EmployeesData",
+						"type": "DatasetReference"
+					},
+					"name": "Employeesdata"
+				},
+				{
+					"dataset": {
+						"referenceName": "Depdata",
+						"type": "DatasetReference"
+					},
+					"name": "Depdata"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "assert1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "filterReqData"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {emp id} as string,",
+				"          {first name} as string,",
+				"          {last name} as string,",
+				"          doj as string,",
+				"          depid as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Employeesdata",
+				"source(output(",
+				"          depid as string,",
+				"          depname as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Depdata",
+				"Employeesdata, Depdata assert(expectTrue(!isNull(toDate(doj,'yyyymmdd')), false, 'assertdoj'),",
+				"     expectUnique({emp id}, false, 'assertempid'),",
+				"     expectExists(Employeesdata@depid == Depdata@depid, false, 'assertDepexist')) ~> assert1",
+				"assert1 derive(isErrorRow = isError(),",
+				"          IsincorrectDeprow = hasError('assertempid')) ~> derivedColumn1",
+				"derivedColumn1 filter(isErrorRow == false()) ~> filterReqData"
+			]
+		}
+	}
+}
