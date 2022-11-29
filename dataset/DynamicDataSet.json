@@ -7,13 +7,16 @@
 		},
 		"parameters": {
 			"FileSystem": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "dldemofilesystem"
 			},
 			"Directory": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "Dataflow"
 			},
 			"Filename": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "employee.csv"
 			}
 		},
 		"annotations": [],
