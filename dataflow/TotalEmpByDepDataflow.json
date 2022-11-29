@@ -40,7 +40,7 @@
 				"     {Total Emp} = count(empid)) ~> AggregateOnDep",
 				"AggregateOnDep sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     partitionFileNames:['EmpCount'],",
+				"     partitionFileNames:['EmpCount.csv'],",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
