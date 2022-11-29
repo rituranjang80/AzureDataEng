@@ -3,11 +3,53 @@
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [],
-			"sinks": [],
-			"transformations": [],
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DynamicDataSet",
+						"type": "DatasetReference"
+					},
+					"name": "Employees"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DynamicDataSet",
+						"type": "DatasetReference"
+					},
+					"name": "TotalEmpByDep"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AggregateOnDep"
+				}
+			],
 			"scriptLines": [
-				""
+				"source(output(",
+				"          empid as short,",
+				"          name as string,",
+				"          country as string,",
+				"          department as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Employees",
+				"Employees aggregate(groupBy(department),",
+				"     {Total Emp} = count(empid)) ~> AggregateOnDep",
+				"AggregateOnDep sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          departmentId = department,",
+				"          {Total Emp}",
+				"     ),",
+				"     partitionBy('hash', 1)) ~> TotalEmpByDep"
 			]
 		}
 	}
