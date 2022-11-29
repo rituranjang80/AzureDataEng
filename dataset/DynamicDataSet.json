@@ -7,16 +7,13 @@
 		},
 		"parameters": {
 			"FileSystem": {
-				"type": "String",
-				"defaultValue": "dldemofilesystem"
+				"type": "String"
 			},
 			"Directory": {
-				"type": "String",
-				"defaultValue": "Dataflow"
+				"type": "String"
 			},
 			"Filename": {
-				"type": "String",
-				"defaultValue": "employee.csv"
+				"type": "String"
 			}
 		},
 		"annotations": [],
@@ -39,6 +36,7 @@
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
+			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
 		"schema": []
