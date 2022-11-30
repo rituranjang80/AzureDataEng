@@ -5,9 +5,9 @@
 		"annotations": [],
 		"type": "FileServer",
 		"typeProperties": {
-			"host": "C:\\testemp\\R",
-			"userId": "RituranjanGupta",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJlMWQ1ZTQ2Yi1iMTgyLTRiYzUtYWY1OC0zMDZhN2JiMDkwYjciLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"host": "\\\\Al01lap158\\r",
+			"userId": "rituranjang@audaxlabs.com",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiIxZDRlMDNhYS00NzI3LTQ4YTctODVlNy05YTcxZTJkYTliZjciLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
 		"connectVia": {
 			"referenceName": "Selfthosted-IntegrationRuntime-522831",
