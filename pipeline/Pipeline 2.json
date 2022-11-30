@@ -1,0 +1,117 @@
+{
+	"name": "Pipeline 2",
+	"properties": {
+		"activities": [
+			{
+				"name": "Web1",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://reqres.in/api/users",
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET"
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Web1",
+						"dependencyConditions": [
+							"Skipped"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@range(1,activity('Web1').output.total_pages )",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "RestSink",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": 10,
+									"requestMethod": "POST",
+									"writeBatchSize": 10000,
+									"httpCompressionType": "none"
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "RestResource13",
+									"type": "DatasetReference",
+									"parameters": {
+										"QueryParameter": {
+											"value": "?page=@item()",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "RestResource12",
+									"type": "DatasetReference",
+									"parameters": {
+										"FileName": "APIPage@{item()}.csv"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"QueryParameter": {
+				"type": "string",
+				"defaultValue": "?page=@item()"
+			}
+		},
+		"variables": {
+			"QueryVariable": {
+				"type": "String",
+				"defaultValue": "?page=@item()&page2=@item"
+			}
+		},
+		"annotations": []
+	}
+}
