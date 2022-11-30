@@ -1,0 +1,16 @@
+{
+	"name": "SqlServer1",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "integrated security=False;data source=AL01LAP158\\SQLEXPRESS;initial catalog=9to5;user id=sa7",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJiMmZiNDkzMi1lMWYxLTQ1NGYtYmJjMS0wNzQzODA3OTE0NjIiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "Selfthosted-IntegrationRuntime-522831",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
