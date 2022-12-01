@@ -9,10 +9,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "var 1",
-					"value": {
-						"value": "@int('2')",
-						"type": "Expression"
-					}
+					"value": "[object Object]"
 				}
 			},
 			{
@@ -29,7 +26,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "var 1",
-					"value": "ddgdg"
+					"value": {
+						"value": "@int('6')",
+						"type": "Expression"
+					}
 				}
 			},
 			{
