@@ -1,7 +1,0 @@
-{
-	"name": "SelfHostedIntegrationRuntime",
-	"properties": {
-		"type": "SelfHosted",
-		"description": "on-premise data movement and transformation activities"
-	}
-}
