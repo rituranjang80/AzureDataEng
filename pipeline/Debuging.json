@@ -1,5 +1,5 @@
 {
-	"name": "Pipeline 1",
+	"name": "Debuging",
 	"properties": {
 		"activities": [
 			{
@@ -69,7 +69,8 @@
 		],
 		"variables": {
 			"var 1": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "a"
 			}
 		},
 		"annotations": []
