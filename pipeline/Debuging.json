@@ -27,7 +27,7 @@
 				"typeProperties": {
 					"variableName": "var 1",
 					"value": {
-						"value": "@int('6')",
+						"value": "@int('4')",
 						"type": "Expression"
 					}
 				}
