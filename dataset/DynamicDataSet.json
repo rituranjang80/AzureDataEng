@@ -7,8 +7,7 @@
 		},
 		"parameters": {
 			"FileSystem": {
-				"type": "String",
-				"defaultValue": "dldemofilesystem"
+				"type": "String"
 			},
 			"Directory": {
 				"type": "String",
