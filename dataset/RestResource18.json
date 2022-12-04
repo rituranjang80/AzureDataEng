@@ -1,0 +1,17 @@
+{
+	"name": "RestResource18",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RestService8",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"queryparameter": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}
