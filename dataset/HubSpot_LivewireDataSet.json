@@ -1,0 +1,23 @@
+{
+	"name": "HubSpot_LivewireDataSet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "HubspotLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": "MLdata/Livewire",
+				"container": "dldemofilesystem"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
