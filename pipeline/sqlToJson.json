@@ -34,7 +34,10 @@
 				"inputs": [
 					{
 						"referenceName": "SqlServerTable1",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"Tablename": "devices"
+						}
 					}
 				],
 				"outputs": [
