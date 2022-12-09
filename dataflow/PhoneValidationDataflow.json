@@ -1,0 +1,54 @@
+{
+	"name": "PhoneValidationDataflow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "HubSpot_LivewireDataSet",
+						"type": "DatasetReference"
+					},
+					"name": "HubspotSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "HubSpot_LivewireDataSet",
+						"type": "DatasetReference"
+					},
+					"name": "LivewireSource"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "join1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          ID as short,",
+				"          NAME as string,",
+				"          PHONE_NUMBER as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> HubspotSource",
+				"source(output(",
+				"          ID as short,",
+				"          NAME as string,",
+				"          PHONE_NUMBER as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> LivewireSource",
+				"HubspotSource, LivewireSource join(HubspotSource@ID == LivewireSource@ID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1"
+			]
+		}
+	}
+}
