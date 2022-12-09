@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 2",
+	"properties": {
+		"content": {
+			"query": "\n\nUse ServerlessPool\nGO\nCREATE MASTER KEY ENCRYPTION BY PASSWORD='09December@2022'\n\nCREATE DATABASE SCOPED CREDENTIAL newCredential1\nWITH IDENTITY='SHARED ACCESS SIGNATURE',\nSECRET='sv=2021-06-08&ss=bfqt&srt=sco&sp=rwdlacupyx&se=2022-12-09T19:21:04Z&st=2022-12-09T11:21:04Z&spr=https&sig=gXd%2BBDMQ8oTxFteMWuAVyP6VQssJhLsmcAIhR6nYmsM%3D'\nGO;\n\nCREATE EXTERNAL DATA SOURCE datasourceADL2 with(\n    LOCATION='https://dldemoaccount.dfs.core.windows.net/',\n    CREDENTIAL=newCredential1\n);\n----create external file format-------------------\nCREATE EXTERNAL FILE FORMAT csvFile\nWITH (\n    FORMAT_TYPE = DELIMITEDTEXT,\n    FORMAT_OPTIONS (\n      FIELD_TERMINATOR = ',',\n      STRING_DELIMITER = '\"',\n      FIRST_ROW = 2,\n      USE_TYPE_DEFAULT = FALSE,\n      ENCODING = 'UTF8' )\n);\n\nCREATE EXTERNAL TABLE employeeExternalTable2 (\n   EMPLOYEE_ID INT  NULL,\n   FIRST_NAME VARCHAR(15) NULL,\n   LAST_NAME VARCHAR(15) NULL,\n   EMAIL VARCHAR(20) NULL,\n   PHONE_NUMBER VARCHAR(20) NULL,\n   HIRE_DATE VARCHAR(10) NULL,\n   JOB_ID VARCHAR(10) NULL,\n   SALARY INT NULL,\n   COMMISSION_PCT VARCHAR(10) NULL,\n   MANAGER_ID INT NULL,\n   DEPARTMENT_ID INT NULL\n   \n)\nWITH (\n    LOCATION='/dldemofilesystem / MLdata/employees.csv',\n    DATA_SOURCE=datasourceADL2,\n    FILE_FORMAT=csvFile\n);\nGO\n\nSELECT TOP 100 * FROM employeeExternalTable2\n\n\n\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "ServerlessPool",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
