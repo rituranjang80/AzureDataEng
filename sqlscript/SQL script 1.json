@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 1",
+	"properties": {
+		"content": {
+			"query": "Use Test\nGO\nCREATE MASTER KEY ENCRYPTION BY PASSWORD='New@Password1'\n\n\n\n\nCREATE DATABASE SCOPED CREDENTIAL dldDemoAccountCredential\nWITH IDENTITY='SHARED ACCESS SIGNATURE',\nSECRET='sv=2021-06-08&ss=bfqt&srt=sco&sp=rwdlacupyx&se=2022-12-14T18:58:30Z&st=2022-12-08T10:58:30Z&spr=https&sig=DuSxN9UI7JexTxxQKXLk9ftIKtPCwH8AgNsxFR0WA3g%3D'\nGO\n\nCREATE EXTERNAL DATA SOURCE newdatasource with(\n    LOCATION='https://dldemoaccount.queue.core.windows.net/',\n    CREDENTIAL=dldDemoAccountCredential\n);",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "Test",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
