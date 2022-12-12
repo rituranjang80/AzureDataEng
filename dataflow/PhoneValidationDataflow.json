@@ -19,10 +19,24 @@
 					"name": "LivewireSource"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "OutputValidatedPhoneData",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
-					"name": "join1"
+					"name": "joinTransformation"
+				},
+				{
+					"name": "derivedColumnTransformation"
+				},
+				{
+					"name": "selectTransformation"
 				}
 			],
 			"scriptLines": [
@@ -47,7 +61,24 @@
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1"
+				"     broadcast: 'auto')~> joinTransformation",
+				"joinTransformation derive(NewPhoneNumber = iif(isNull(HubspotSource@PHONE_NUMBER), LivewireSource@PHONE_NUMBER, HubspotSource@PHONE_NUMBER)) ~> derivedColumnTransformation",
+				"derivedColumnTransformation select(mapColumn(",
+				"          ID = HubspotSource@ID,",
+				"          NAME = HubspotSource@NAME,",
+				"          NewPhoneNumber",
+				"     ),",
+				"     partitionBy('hash', 1),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectTransformation",
+				"selectTransformation sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
 			]
 		}
 	}
