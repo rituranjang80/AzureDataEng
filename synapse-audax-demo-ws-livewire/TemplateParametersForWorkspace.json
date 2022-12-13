@@ -14,8 +14,26 @@
 		"AzureDataLakeStorage2_accountKey": {
 			"value": ""
 		},
-		"synapse-audax-demo-ws-livewire-WorkspaceDefaultSqlServer_connectionString": {
+		"AzureSqlDatabase1_connectionString": {
 			"value": ""
+		},
+		"FileServer1_password": {
+			"value": ""
+		},
+		"HubspotLinkedService_connectionString": {
+			"value": ""
+		},
+		"SqlServer1_connectionString": {
+			"value": ""
+		},
+		"SqlServer2_connectionString": {
+			"value": ""
+		},
+		"SqlServerJatin_connectionString": {
+			"value": ""
+		},
+		"synapse-audax-demo-ws-livewire-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-audax-demo-ws-livewire.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"value": "https://dldemoaccount.dfs.core.windows.net/"
@@ -29,8 +47,29 @@
 		"AzureDataLakeStorage2_properties_typeProperties_url": {
 			"value": "https://dldemoaccount.dfs.core.windows.net/"
 		},
-		"RestService1_properties_typeProperties_url": {
+		"FileServer1_properties_typeProperties_host": {
+			"value": "\\\\Al01lap158\\r"
+		},
+		"FileServer1_properties_typeProperties_userId": {
+			"value": "rituranjang@audaxlabs.com"
+		},
+		"RestService2_properties_typeProperties_url": {
 			"value": "https://reqres.in/api/users/"
+		},
+		"RestService3_properties_typeProperties_url": {
+			"value": "https://reqres.in/api/users"
+		},
+		"RestService4_properties_typeProperties_url": {
+			"value": "https://reqres.in/api/users"
+		},
+		"RestService5_properties_typeProperties_url": {
+			"value": "https://reqres.in/api/users"
+		},
+		"RestService6_properties_typeProperties_url": {
+			"value": "https://reqres.in/api/users"
+		},
+		"RestService7_properties_typeProperties_url": {
+			"value": "https://reqres.in/api/users"
 		},
 		"synapse-audax-demo-ws-livewire-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://dldemoaccount.dfs.core.windows.net"
