@@ -1,0 +1,35 @@
+{
+	"name": "OnPremiseSqlServerTableJatin",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "OnPremiseSqlServerJatin",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "Id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Course",
+				"type": "varchar"
+			},
+			{
+				"name": "Roll_No",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Student"
+		}
+	}
+}
