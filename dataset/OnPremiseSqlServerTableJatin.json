@@ -5,31 +5,20 @@
 			"referenceName": "OnPremiseSqlServerJatin",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"tableName": {
+				"type": "String"
+			}
+		},
 		"annotations": [],
 		"type": "SqlServerTable",
-		"schema": [
-			{
-				"name": "Id",
-				"type": "int",
-				"precision": 10
-			},
-			{
-				"name": "Name",
-				"type": "varchar"
-			},
-			{
-				"name": "Course",
-				"type": "varchar"
-			},
-			{
-				"name": "Roll_No",
-				"type": "int",
-				"precision": 10
-			}
-		],
+		"schema": [],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "Student"
+			"table": {
+				"value": "@dataset().tableName",
+				"type": "Expression"
+			}
 		}
 	}
 }
