@@ -2104,31 +2104,20 @@
 					"referenceName": "OnPremiseSqlServerJatin",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"tableName": {
+						"type": "String"
+					}
+				},
 				"annotations": [],
 				"type": "SqlServerTable",
-				"schema": [
-					{
-						"name": "Id",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "Name",
-						"type": "varchar"
-					},
-					{
-						"name": "Course",
-						"type": "varchar"
-					},
-					{
-						"name": "Roll_No",
-						"type": "int",
-						"precision": 10
-					}
-				],
+				"schema": [],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "Student"
+					"table": {
+						"value": "@dataset().tableName",
+						"type": "Expression"
+					}
 				}
 			},
 			"dependsOn": [
@@ -3495,93 +3484,6 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/OnPremiseSqlTableDataPipeline')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderQuery": {
-									"value": "@concat('select * from Student\nwhere ModifiedDateTime <', pipeline().parameters.endTime, 'and CreatedDateTime > ', pipeline().parameters.startTime)",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "ParquetSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "ParquetWriteSettings"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "OnPremiseSqlServerTableJatin",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "OnPremiseSQLJatinDataSetParquetFormat",
-								"type": "DatasetReference",
-								"parameters": {
-									"fileName": {
-										"value": "@concat('data',utcnow(),'.parquet')",
-										"type": "Expression"
-									}
-								}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"parameters": {
-					"startTime": {
-						"type": "String"
-					},
-					"endTime": {
-						"type": "String"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/datasets/OnPremiseSqlServerTableJatin')]",
-				"[concat(variables('workspaceId'), '/datasets/OnPremiseSQLJatinDataSetParquetFormat')]"
-			]
 		}
 	]
 }
