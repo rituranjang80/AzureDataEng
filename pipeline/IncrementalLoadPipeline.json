@@ -27,7 +27,7 @@
 							"tableName": "WaterMark"
 						}
 					},
-					"firstRowOnly": false
+					"firstRowOnly": true
 				}
 			},
 			{
@@ -56,7 +56,7 @@
 							"tableName": "Student"
 						}
 					},
-					"firstRowOnly": false
+					"firstRowOnly": true
 				}
 			},
 			{
