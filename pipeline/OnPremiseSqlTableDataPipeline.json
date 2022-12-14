@@ -17,6 +17,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlServerSource",
+						"sqlReaderQuery": {
+							"value": "@concat('select * from Student\nwhere ModifiedDateTime <', pipeline().parameters.endTime, 'and CreatedDateTime > ', pipeline().parameters.startTime)",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -59,6 +63,14 @@
 				]
 			}
 		],
+		"parameters": {
+			"startTime": {
+				"type": "String"
+			},
+			"endTime": {
+				"type": "String"
+			}
+		},
 		"annotations": []
 	}
 }
