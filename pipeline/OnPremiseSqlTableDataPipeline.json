@@ -51,7 +51,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"fileName": {
-								"value": "@concat('data',utcnow())",
+								"value": "@concat('data',utcnow(),'.parquet')",
 								"type": "Expression"
 							}
 						}
