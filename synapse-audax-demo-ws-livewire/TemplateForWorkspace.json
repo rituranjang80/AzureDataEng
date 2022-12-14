@@ -31,6 +31,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'HubspotLinkedService'"
 		},
+		"OnPremiseSqlServerJatin_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'OnPremiseSqlServerJatin'"
+		},
 		"SqlServer1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SqlServer1'"
@@ -2439,6 +2443,25 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/OnPremiseSqlServerJatin')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('OnPremiseSqlServerJatin_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "OnPremiseIR",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/OnPremiseIR')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/PowerBIWorkspace1')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -3398,6 +3421,46 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OnPremiseSqlServerTableJatin')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "OnPremiseSqlServerJatin",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "Id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Name",
+						"type": "varchar"
+					},
+					{
+						"name": "Course",
+						"type": "varchar"
+					},
+					{
+						"name": "Roll_No",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Student"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/OnPremiseSqlServerJatin')]"
+			]
 		}
 	]
 }
