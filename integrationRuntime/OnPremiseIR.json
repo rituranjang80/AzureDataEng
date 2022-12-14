@@ -1,0 +1,6 @@
+{
+	"name": "OnPremiseIR",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
