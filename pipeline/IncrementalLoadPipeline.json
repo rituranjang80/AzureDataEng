@@ -60,7 +60,7 @@
 				}
 			},
 			{
-				"name": "Copy data1",
+				"name": "IncrementalLoad",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -136,11 +136,11 @@
 				]
 			},
 			{
-				"name": "Stored procedure1",
+				"name": "UpdateWaterMarkValue",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "Copy data1",
+						"activity": "IncrementalLoad",
 						"dependencyConditions": [
 							"Succeeded"
 						]
