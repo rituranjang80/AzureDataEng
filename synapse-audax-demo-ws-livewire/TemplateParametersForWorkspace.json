@@ -29,9 +29,6 @@
 		"SqlServer2_connectionString": {
 			"value": ""
 		},
-		"SqlServerJatin_connectionString": {
-			"value": ""
-		},
 		"synapse-audax-demo-ws-livewire-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-audax-demo-ws-livewire.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},

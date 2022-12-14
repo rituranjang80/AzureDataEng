@@ -39,10 +39,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SqlServer2'"
 		},
-		"SqlServerJatin_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'SqlServerJatin'"
-		},
 		"synapse-audax-demo-ws-livewire-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'synapse-audax-demo-ws-livewire-WorkspaceDefaultSqlServer'",
@@ -2624,25 +2620,6 @@
 				"type": "SqlServer",
 				"typeProperties": {
 					"connectionString": "[parameters('SqlServer2_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "Selfthosted-IntegrationRuntime-522831",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/Selfthosted-IntegrationRuntime-522831')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SqlServerJatin')]",
-			"type": "Microsoft.Synapse/workspaces/linkedServices",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"type": "SqlServer",
-				"typeProperties": {
-					"connectionString": "[parameters('SqlServerJatin_connectionString')]"
 				},
 				"connectVia": {
 					"referenceName": "Selfthosted-IntegrationRuntime-522831",
