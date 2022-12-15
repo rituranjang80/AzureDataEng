@@ -1,0 +1,184 @@
+{
+	"name": "IncrementalLoadPipeline_copy1",
+	"properties": {
+		"activities": [
+			{
+				"name": "WaterMark_Lookup",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "OnPremiseSqlServerTableJatin",
+						"type": "DatasetReference",
+						"parameters": {
+							"tableName": "WaterMark"
+						}
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "SourceTable_Lookup",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "select MAX(ModifiedDateTime) as LatestDateTime\nFROM [dbo].[Student]",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "OnPremiseSqlServerTableJatin",
+						"type": "DatasetReference",
+						"parameters": {
+							"tableName": "Student"
+						}
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "IncrementalLoad",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "WaterMark_Lookup",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "SourceTable_Lookup",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": {
+							"value": "select * from [dbo].[Student]\nwhere ModifiedDateTime > '@{activity('WaterMark_Lookup').output.firstRow.WaterMarkValue}'\nand ModifiedDateTime <= '@{activity('SourceTable_Lookup').output.firstRow.LatestDateTime}'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "OnPremiseSqlServerTableJatin",
+						"type": "DatasetReference",
+						"parameters": {
+							"tableName": "Student"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "OnPremiseSQLJatinDataSetParquetFormat",
+						"type": "DatasetReference",
+						"parameters": {
+							"fileName": {
+								"value": "@concat('data', utcnow(), '.parquet')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "UpdateWaterMarkValue",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "IncrementalLoad",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[SP_Update_WaterMarkTable]",
+					"storedProcedureParameters": {
+						"lastModified": {
+							"value": {
+								"value": "@activity('SourceTable_Lookup').output.firstRow.LatestDateTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"table": {
+							"value": {
+								"value": "@activity('WaterMark_Lookup').output.firstRow.TableName",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "OnPremiseSqlServerJatin",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": []
+	}
+}
