@@ -88,7 +88,7 @@
 					"source": {
 						"type": "SqlServerSource",
 						"sqlReaderQuery": {
-							"value": "select * from [dbo].[Student]\nwhere ModifiedDateTime > '@{activity('WaterMark_Lookup').output.firstRow.WaterMarkValue}'\nand ModifiedDateTime =< '@{activity('SourceTable_Lookup').output.firstRow.LatestDateTime}'",
+							"value": "select * from [dbo].[Student]\nwhere ModifiedDateTime > '@{activity('WaterMark_Lookup').output.firstRow.WaterMarkValue}'\nand ModifiedDateTime <= '@{activity('SourceTable_Lookup').output.firstRow.LatestDateTime}'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
