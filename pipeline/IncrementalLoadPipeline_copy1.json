@@ -128,7 +128,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"fileName": {
-								"value": "@concat('data', utcnow(), '.parquet')",
+								"value": "@concat('data', utcNow(), '.parquet')",
 								"type": "Expression"
 							}
 						}
