@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e8e254b1-1be8-40d6-b972-179244664ac5"
+				"spark.autotune.trackingId": "a59dd170-256a-4b35-a8e7-04b78092389b"
 			}
 		},
 		"metadata": {
@@ -51,16 +51,48 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"ModifiedDf = spark.read.parquet('abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/OnPremiseSqlTableDataJatin/data2022-12-16T06:50:53.6208597Z.parquet')\r\n",
+					"ModifiedDf = spark.read.parquet('abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/OnPremiseSqlTableDataJatin/data2022-12-16T11:01:55.5953188Z.parquet')\r\n",
 					"FullDataDf = spark.read.parquet('abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/OnPremiseSqlTableDataJatin/FullLoad.parquet')\r\n",
 					"\r\n",
-					"ModifiedDf.printSchema()\r\n",
-					"ModifiedDf.show()\r\n",
+					"FullDataDf.write.mode('append').parquet('abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/OnPremiseSqlTableDataJatin/data2022-12-16T11:01:55.5953188Z.parquet')\r\n",
+					"# ModifiedDf.printSchema()\r\n",
+					"# ModifiedDf.show()\r\n",
+					"print('Appended DF')\r\n",
 					"\r\n",
-					"FullDataDf.printSchema()\r\n",
-					"FullDataDf.show()"
+					"# ModifiedDf.createOrReplaceTempView('IncrementalDataSet')\r\n",
+					"\r\n",
+					"# FullDataDf.printSchema()\r\n",
+					"# FullDataDf.show()\r\n",
+					"FullDataDf.createOrReplaceTempView('FullDataSet')\r\n",
+					"\r\n",
+					"# df = spark.sql('''\r\n",
+					"# SELECT * FROM IncrementalDataSet i\r\n",
+					"# INNER JOIN FullDataSet f on f.Id = i.Id\r\n",
+					"# group by ModifiedDateTime\r\n",
+					"# ''')\r\n",
+					"\r\n",
+					"# df.show()"
 				],
-				"execution_count": null
+				"execution_count": 7
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"joinedDf = ModifiedDf.join(FullDataDf, ModifiedDf.Id == FullDataDf.Id, 'inner')\r\n",
+					"joinedDf.show()"
+				],
+				"execution_count": 4
 			}
 		]
 	}
