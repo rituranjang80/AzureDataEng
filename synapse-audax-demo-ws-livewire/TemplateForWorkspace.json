@@ -600,6 +600,154 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/FullLoadPipeline')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Id",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "Id",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "Name",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Name",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Course",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Course",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Roll_No",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "Roll_No",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedDateTime",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "CreatedDateTime",
+											"type": "DateTime",
+											"physicalType": "INT_96"
+										}
+									},
+									{
+										"source": {
+											"name": "ModifiedDateTime",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "ModifiedDateTime",
+											"type": "DateTime",
+											"physicalType": "INT_96"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OnPremiseSqlServerTableJatin",
+								"type": "DatasetReference",
+								"parameters": {
+									"tableName": "Student"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "OnPremiseSQLJatinDataSetParquetFormat",
+								"type": "DatasetReference",
+								"parameters": {
+									"fileName": "FullLoad.parquet"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/OnPremiseSqlServerTableJatin')]",
+				"[concat(variables('workspaceId'), '/datasets/OnPremiseSQLJatinDataSetParquetFormat')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/IncrementalLoadPipeline')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -3622,6 +3770,109 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/JoinDataSet')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "apachesparkpool",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "a59dd170-256a-4b35-a8e7-04b78092389b"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/422cf0b3-8d06-4fc7-8903-2cb72dd00d8f/resourceGroups/Livewire/providers/Microsoft.Synapse/workspaces/synapse-audax-demo-ws-livewire/bigDataPools/apachesparkpool",
+						"name": "apachesparkpool",
+						"type": "Spark",
+						"endpoint": "https://synapse-audax-demo-ws-livewire.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/apachesparkpool",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"ModifiedDf = spark.read.parquet('abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/OnPremiseSqlTableDataJatin/data2022-12-16T11:01:55.5953188Z.parquet')\r\n",
+							"FullDataDf = spark.read.parquet('abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/OnPremiseSqlTableDataJatin/FullLoad.parquet')\r\n",
+							"\r\n",
+							"FullDataDf.write.mode('append').parquet('abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/OnPremiseSqlTableDataJatin/data2022-12-16T11:01:55.5953188Z.parquet')\r\n",
+							"# ModifiedDf.printSchema()\r\n",
+							"# ModifiedDf.show()\r\n",
+							"print('Appended DF')\r\n",
+							"\r\n",
+							"# ModifiedDf.createOrReplaceTempView('IncrementalDataSet')\r\n",
+							"\r\n",
+							"# FullDataDf.printSchema()\r\n",
+							"# FullDataDf.show()\r\n",
+							"FullDataDf.createOrReplaceTempView('FullDataSet')\r\n",
+							"\r\n",
+							"# df = spark.sql('''\r\n",
+							"# SELECT * FROM IncrementalDataSet i\r\n",
+							"# INNER JOIN FullDataSet f on f.Id = i.Id\r\n",
+							"# group by ModifiedDateTime\r\n",
+							"# ''')\r\n",
+							"\r\n",
+							"# df.show()"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"joinedDf = ModifiedDf.join(FullDataDf, ModifiedDf.Id == FullDataDf.Id, 'inner')\r\n",
+							"joinedDf.show()"
+						],
+						"outputs": [],
+						"execution_count": 4
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/ReadWriteblob')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -3874,154 +4125,6 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/FullLoadPipeline')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "ParquetSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "ParquetWriteSettings"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "Id",
-											"type": "Int32",
-											"physicalType": "int"
-										},
-										"sink": {
-											"name": "Id",
-											"type": "Int32",
-											"physicalType": "INT_32"
-										}
-									},
-									{
-										"source": {
-											"name": "Name",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "Name",
-											"type": "String",
-											"physicalType": "UTF8"
-										}
-									},
-									{
-										"source": {
-											"name": "Course",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "Course",
-											"type": "String",
-											"physicalType": "UTF8"
-										}
-									},
-									{
-										"source": {
-											"name": "Roll_No",
-											"type": "Int32",
-											"physicalType": "int"
-										},
-										"sink": {
-											"name": "Roll_No",
-											"type": "Int32",
-											"physicalType": "INT_32"
-										}
-									},
-									{
-										"source": {
-											"name": "CreatedDateTime",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "CreatedDateTime",
-											"type": "DateTime",
-											"physicalType": "INT_96"
-										}
-									},
-									{
-										"source": {
-											"name": "ModifiedDateTime",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "ModifiedDateTime",
-											"type": "DateTime",
-											"physicalType": "INT_96"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "OnPremiseSqlServerTableJatin",
-								"type": "DatasetReference",
-								"parameters": {
-									"tableName": "Student"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "OnPremiseSQLJatinDataSetParquetFormat",
-								"type": "DatasetReference",
-								"parameters": {
-									"fileName": "FullLoad.parquet"
-								}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/datasets/OnPremiseSqlServerTableJatin')]",
-				"[concat(variables('workspaceId'), '/datasets/OnPremiseSQLJatinDataSetParquetFormat')]"
-			]
 		}
 	]
 }
