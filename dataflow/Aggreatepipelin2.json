@@ -51,11 +51,13 @@
 				"          Column_1 as string,",
 				"          Column_2 as string",
 				"     ),",
+				"     partitionFileNames:['aggreatepipeline'],",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink1"
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
 			]
 		}
 	}
