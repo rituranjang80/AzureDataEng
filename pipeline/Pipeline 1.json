@@ -63,6 +63,14 @@
 				]
 			}
 		],
+		"parameters": {
+			"sourcefile": {
+				"type": "string"
+			},
+			"sourcepath": {
+				"type": "string"
+			}
+		},
 		"annotations": []
 	}
 }
