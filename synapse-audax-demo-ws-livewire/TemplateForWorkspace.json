@@ -99,6 +99,18 @@
 		"synapse-audax-demo-ws-livewire-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://dldemoaccount.dfs.core.windows.net"
+		},
+		"eventTrigger_properties_Pipeline 1_parameters_sourcefile": {
+			"type": "string",
+			"defaultValue": "@triggerBody().fileName"
+		},
+		"eventTrigger_properties_Pipeline 1_parameters_sourcepath": {
+			"type": "string",
+			"defaultValue": "@triggerBody().filePath"
+		},
+		"eventTrigger_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/422cf0b3-8d06-4fc7-8903-2cb72dd00d8f/resourceGroups/Livewire/providers/Microsoft.Storage/storageAccounts/dldemoaccount"
 		}
 	},
 	"variables": {
@@ -1261,6 +1273,14 @@
 				"policy": {
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
+				},
+				"parameters": {
+					"sourcefile": {
+						"type": "string"
+					},
+					"sourcepath": {
+						"type": "string"
+					}
 				},
 				"annotations": []
 			},
@@ -4270,6 +4290,41 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/eventTrigger')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Pipeline 1",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"sourcefile": "[parameters('eventTrigger_properties_Pipeline 1_parameters_sourcefile')]",
+							"sourcepath": "[parameters('eventTrigger_properties_Pipeline 1_parameters_sourcepath')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/dldemofilesystem/blobs/MLdata/Input/",
+					"blobPathEndsWith": ".csv",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('eventTrigger_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated",
+						"Microsoft.Storage.BlobDeleted"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/Pipeline 1')]"
+			]
 		}
 	]
 }
