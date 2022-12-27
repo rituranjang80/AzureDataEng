@@ -3,18 +3,7 @@
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
-		"pipelines": [
-			{
-				"pipelineReference": {
-					"referenceName": "Pipeline 1",
-					"type": "PipelineReference"
-				},
-				"parameters": {
-					"sourcefile": "@triggerBody().fileName",
-					"sourcepath": "@triggerBody().filePath"
-				}
-			}
-		],
+		"pipelines": [],
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
 			"blobPathBeginsWith": "/dldemofilesystem/blobs/MLdata/Input/",
