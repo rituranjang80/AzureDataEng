@@ -1,0 +1,24 @@
+{
+	"name": "scheduleTigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "eventTigger2",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 2,
+				"startTime": "2022-12-27T12:27:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}
