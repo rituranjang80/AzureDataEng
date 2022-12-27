@@ -103,6 +103,10 @@
 		"eventTrigger_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/422cf0b3-8d06-4fc7-8903-2cb72dd00d8f/resourceGroups/Livewire/providers/Microsoft.Storage/storageAccounts/dldemoaccount"
+		},
+		"eventtigger_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/422cf0b3-8d06-4fc7-8903-2cb72dd00d8f/resourceGroups/Livewire/providers/Microsoft.Storage/storageAccounts/dldemoaccount"
 		}
 	},
 	"variables": {
@@ -4587,6 +4591,38 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/eventtigger')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "eventTigger2",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/dldemofilesystem/blobs/MLdata/Input/",
+					"blobPathEndsWith": ".csv",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('eventtigger_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated",
+						"Microsoft.Storage.BlobDeleted"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/eventTigger2')]"
+			]
 		}
 	]
 }
