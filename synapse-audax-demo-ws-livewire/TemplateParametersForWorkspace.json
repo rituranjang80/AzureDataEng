@@ -74,12 +74,6 @@
 		"synapse-audax-demo-ws-livewire-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://dldemoaccount.dfs.core.windows.net"
 		},
-		"eventTrigger_properties_Pipeline 1_parameters_sourcefile": {
-			"value": "@triggerBody().fileName"
-		},
-		"eventTrigger_properties_Pipeline 1_parameters_sourcepath": {
-			"value": "@triggerBody().filePath"
-		},
 		"eventTrigger_properties_typeProperties_scope": {
 			"value": "/subscriptions/422cf0b3-8d06-4fc7-8903-2cb72dd00d8f/resourceGroups/Livewire/providers/Microsoft.Storage/storageAccounts/dldemoaccount"
 		}
