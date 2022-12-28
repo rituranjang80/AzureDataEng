@@ -1,0 +1,89 @@
+{
+	"name": "unionTransformation",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "developers",
+						"type": "DatasetReference"
+					},
+					"name": "developers"
+				},
+				{
+					"dataset": {
+						"referenceName": "qa",
+						"type": "DatasetReference"
+					},
+					"name": "qa"
+				},
+				{
+					"dataset": {
+						"referenceName": "hr",
+						"type": "DatasetReference"
+					},
+					"name": "hr"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "allemployees",
+						"type": "DatasetReference"
+					},
+					"name": "allemplyees"
+				}
+			],
+			"transformations": [
+				{
+					"name": "union1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          empid as string,",
+				"          name as string,",
+				"          country as string,",
+				"          department as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> developers",
+				"source(output(",
+				"          empid as string,",
+				"          name as string,",
+				"          country as string,",
+				"          department as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> qa",
+				"source(output(",
+				"          empid as string,",
+				"          name as string,",
+				"          country as string,",
+				"          department as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> hr",
+				"developers, qa, hr union(byName: true)~> union1",
+				"union1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          ID as string,",
+				"          NAME as string,",
+				"          PHONE_NUMBER as string",
+				"     ),",
+				"     partitionFileNames:['allemployees.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> allemplyees"
+			]
+		}
+	}
+}
