@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c4c9e071-28ac-4d6f-bc69-1e5e29091cb6"
+				"spark.autotune.trackingId": "ce5cf1af-2dbf-408a-b6f5-7cb4d2ea9578"
 			}
 		},
 		"metadata": {
@@ -56,6 +56,44 @@
 					"df.printSchema()"
 				],
 				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"orcdf=spark.read.format(\"orc\").format('abfss://dldemofilesystem@dldemoaccount.dfs.core.windows.net/MLdata/employees.orc')\r\n",
+					"orcdf.show()\r\n",
+					""
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
 			}
 		]
 	}
