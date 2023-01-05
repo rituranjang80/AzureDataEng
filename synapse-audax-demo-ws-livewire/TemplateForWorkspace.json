@@ -31,6 +31,11 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'HubspotLinkedService'"
 		},
+		"OnPremSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'OnPremSqlServer'",
+			"defaultValue": "Integrated Security=False;Data Source=@{linkedService().serverName};Initial Catalog=@{linkedService().dbName};User ID=@{linkedService().userName};Password=@{linkedService().password}"
+		},
 		"OnPremiseSqlServerJatin_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'OnPremiseSqlServerJatin'"
@@ -47,11 +52,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'synapse-audax-demo-ws-livewire-WorkspaceDefaultSqlServer'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-audax-demo-ws-livewire.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
-		},
-		"OnPremSqlServer_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'OnPremSqlServer'",
-			"defaultValue": "Integrated Security=False;Data Source=@{linkedService().serverName};Initial Catalog=@{linkedService().dbName};User ID=@{linkedService().userName};Password=@{linkedService().password}"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
@@ -3483,6 +3483,39 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/OnPremSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"serverName": {
+						"type": "String"
+					},
+					"dbName": {
+						"type": "String"
+					},
+					"userName": {
+						"type": "String"
+					},
+					"password": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('OnPremSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "SelfHostedIR",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/SelfHostedIR')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/OnPremiseSqlServerJatin')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -3885,6 +3918,17 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SelfHostedIR')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "SelfHosted",
+				"description": "This IR is for POC purpose",
 				"typeProperties": {}
 			},
 			"dependsOn": []
@@ -4660,26 +4704,34 @@
 			"location": "centralus"
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/SelfHostedIR')]",
-			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"name": "[concat(parameters('workspaceName'), '/OnPremSqlServerDataSet')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
-				"type": "SelfHosted",
-				"description": "This IR is for POC purpose",
-				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/OnPremSqlServer')]",
-			"type": "Microsoft.Synapse/workspaces/linkedServices",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
+				"linkedServiceName": {
+					"referenceName": "OnPremSqlServer",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"serverName": {
+							"value": "@dataset().serverName",
+							"type": "Expression"
+						},
+						"dbName": {
+							"value": "@dataset().dbName",
+							"type": "Expression"
+						},
+						"userName": {
+							"value": "@dataset().userName",
+							"type": "Expression"
+						},
+						"password": {
+							"value": "@dataset().password",
+							"type": "Expression"
+						}
+					}
+				},
 				"parameters": {
 					"serverName": {
-						"type": "String"
-					},
-					"dbName": {
 						"type": "String"
 					},
 					"userName": {
@@ -4687,20 +4739,86 @@
 					},
 					"password": {
 						"type": "String"
+					},
+					"dbName": {
+						"type": "String"
 					}
 				},
 				"annotations": [],
-				"type": "SqlServer",
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "varchar"
+					},
+					{
+						"name": "gender",
+						"type": "varchar"
+					},
+					{
+						"name": "birthdate",
+						"type": "date"
+					},
+					{
+						"name": "maiden_name",
+						"type": "varchar"
+					},
+					{
+						"name": "lname",
+						"type": "varchar"
+					},
+					{
+						"name": "fname",
+						"type": "varchar"
+					},
+					{
+						"name": "address",
+						"type": "varchar"
+					},
+					{
+						"name": "city",
+						"type": "varchar"
+					},
+					{
+						"name": "state",
+						"type": "varchar"
+					},
+					{
+						"name": "zip",
+						"type": "varchar"
+					},
+					{
+						"name": "phone",
+						"type": "varchar"
+					},
+					{
+						"name": "email",
+						"type": "varchar"
+					},
+					{
+						"name": "cc_type",
+						"type": "varchar"
+					},
+					{
+						"name": "cc_number",
+						"type": "varchar"
+					},
+					{
+						"name": "cc_cvc",
+						"type": "varchar"
+					},
+					{
+						"name": "cc_expiredate",
+						"type": "date"
+					}
+				],
 				"typeProperties": {
-					"connectionString": "[parameters('OnPremSqlServer_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "SelfHostedIR",
-					"type": "IntegrationRuntimeReference"
+					"schema": "dbo",
+					"table": "Sample_PII_Data"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/SelfHostedIR')]"
+				"[concat(variables('workspaceId'), '/linkedServices/OnPremSqlServer')]"
 			]
 		}
 	]
