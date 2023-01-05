@@ -74,7 +74,17 @@
 				"outputs": [
 					{
 						"referenceName": "AzureSqlTable",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": {
+								"value": "@pipeline().parameters.destSchema",
+								"type": "Expression"
+							},
+							"destTableName": {
+								"value": "@pipeline().parameters.destTableName",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			}
@@ -96,6 +106,12 @@
 				"type": "String"
 			},
 			"tableName": {
+				"type": "String"
+			},
+			"destSchema": {
+				"type": "String"
+			},
+			"destTableName": {
 				"type": "String"
 			}
 		},
