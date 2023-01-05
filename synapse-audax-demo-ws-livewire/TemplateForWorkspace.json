@@ -116,6 +116,14 @@
 		"eventtigger_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/422cf0b3-8d06-4fc7-8903-2cb72dd00d8f/resourceGroups/Livewire/providers/Microsoft.Storage/storageAccounts/dldemoaccount"
+		},
+		"tumblingWindowTrigger_properties_pipeline_parameters_pstartdate": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowStartTime"
+		},
+		"tumblingWindowTrigger_properties_pipeline_parameters_penddate": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowEndTime"
 		}
 	},
 	"variables": {
@@ -1331,6 +1339,97 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/dataflows/PhoneValidationDataflow')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Pipeline 1')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": "[dbo].[prc_LoadCustomer]",
+								"storedProcedureParameters": {
+									"enddate": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.penddate",
+											"type": "Expression"
+										}
+									},
+									"startdate": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.pstartdate",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "SqlServerSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SqlServerTrigger",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SqlServerTabletriggerDest",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"pstartdate": {
+						"type": "string"
+					},
+					"penddate": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/SqlServerTrigger')]",
+				"[concat(variables('workspaceId'), '/datasets/SqlServerTabletriggerDest')]"
 			]
 		},
 		{
@@ -3508,6 +3607,51 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SqlServerTabletriggerDest')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "OnPremSqlServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Customer_Dest"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/OnPremSqlServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SqlServerTrigger')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "OnPremSqlServer",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"serverName": "AL01LAP135\\SQLEXPRESS",
+						"dbName": "StudentDb",
+						"userName": "root",
+						"password": "Namita@256"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/OnPremSqlServer')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/copydatacsv')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -4206,6 +4350,41 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/pipelines/eventTigger2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/tumblingWindowTrigger')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "Pipeline 1",
+						"type": "PipelineReference"
+					},
+					"parameters": {
+						"pstartdate": "[parameters('tumblingWindowTrigger_properties_pipeline_parameters_pstartdate')]",
+						"penddate": "[parameters('tumblingWindowTrigger_properties_pipeline_parameters_penddate')]"
+					}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Hour",
+					"interval": 24,
+					"startTime": "2021-08-01T00:00:00Z",
+					"endTime": "2021-08-08T23:59:00Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/Pipeline 1')]"
 			]
 		},
 		{
