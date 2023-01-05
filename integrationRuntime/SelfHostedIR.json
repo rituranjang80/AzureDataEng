@@ -1,0 +1,7 @@
+{
+	"name": "SelfHostedIR",
+	"properties": {
+		"type": "SelfHosted",
+		"description": "This IR is for POC purpose"
+	}
+}
