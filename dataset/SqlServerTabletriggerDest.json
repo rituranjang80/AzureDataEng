@@ -3,7 +3,13 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "OnPremSqlServer",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"serverName": "AL01LAP135\\SQLEXPRESS",
+				"dbName": "StudentDb",
+				"userName": "root",
+				"password": "Namita@256"
+			}
 		},
 		"annotations": [],
 		"type": "SqlServerTable",
