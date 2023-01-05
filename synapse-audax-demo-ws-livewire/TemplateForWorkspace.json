@@ -3034,6 +3034,12 @@
 					},
 					"dbName": {
 						"type": "String"
+					},
+					"schema": {
+						"type": "String"
+					},
+					"tableName": {
+						"type": "String"
 					}
 				},
 				"annotations": [],
@@ -3105,8 +3111,14 @@
 					}
 				],
 				"typeProperties": {
-					"schema": "dbo",
-					"table": "Sample_PII_Data"
+					"schema": {
+						"value": "@dataset().schema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().tableName",
+						"type": "Expression"
+					}
 				}
 			},
 			"dependsOn": [
