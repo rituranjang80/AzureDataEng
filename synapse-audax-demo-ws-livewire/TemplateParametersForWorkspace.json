@@ -35,6 +35,9 @@
 		"synapse-audax-demo-ws-livewire-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-audax-demo-ws-livewire.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
+		"OnPremSqlServer_connectionString": {
+			"value": "Integrated Security=False;Data Source=@{linkedService().serverName};Initial Catalog=@{linkedService().dbName};User ID=@{linkedService().userName};Password=@{linkedService().password}"
+		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"value": "https://dldemoaccount.dfs.core.windows.net/"
 		},

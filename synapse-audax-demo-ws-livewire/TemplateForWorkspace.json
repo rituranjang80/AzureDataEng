@@ -48,6 +48,11 @@
 			"metadata": "Secure string for 'connectionString' of 'synapse-audax-demo-ws-livewire-WorkspaceDefaultSqlServer'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-audax-demo-ws-livewire.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
+		"OnPremSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'OnPremSqlServer'",
+			"defaultValue": "Integrated Security=False;Data Source=@{linkedService().serverName};Initial Catalog=@{linkedService().dbName};User ID=@{linkedService().userName};Password=@{linkedService().password}"
+		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://dldemoaccount.dfs.core.windows.net/"
@@ -3767,7 +3772,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Started",
+				"runtimeState": "Stopped",
 				"pipelines": [
 					{
 						"pipelineReference": {
@@ -3791,6 +3796,68 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/pipelines/eventTrigger')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/eventtigger')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "eventTigger2",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/dldemofilesystem/blobs/MLdata/Input/",
+					"blobPathEndsWith": ".csv",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('eventtigger_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated",
+						"Microsoft.Storage.BlobDeleted"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/eventTigger2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/scheduleTigger')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "eventTigger2",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 2,
+						"startTime": "2022-12-27T12:27:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/eventTigger2')]"
 			]
 		},
 		{
@@ -4593,35 +4660,47 @@
 			"location": "centralus"
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/eventtigger')]",
-			"type": "Microsoft.Synapse/workspaces/triggers",
+			"name": "[concat(parameters('workspaceName'), '/SelfHostedIR')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "eventTigger2",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
+				"type": "SelfHosted",
+				"description": "This IR is for POC purpose",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OnPremSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"serverName": {
+						"type": "String"
+					},
+					"dbName": {
+						"type": "String"
+					},
+					"userName": {
+						"type": "String"
+					},
+					"password": {
+						"type": "String"
 					}
-				],
-				"type": "BlobEventsTrigger",
+				},
+				"annotations": [],
+				"type": "SqlServer",
 				"typeProperties": {
-					"blobPathBeginsWith": "/dldemofilesystem/blobs/MLdata/Input/",
-					"blobPathEndsWith": ".csv",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('eventtigger_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated",
-						"Microsoft.Storage.BlobDeleted"
-					]
+					"connectionString": "[parameters('OnPremSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "SelfHostedIR",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/pipelines/eventTigger2')]"
+				"[concat(variables('workspaceId'), '/integrationRuntimes/SelfHostedIR')]"
 			]
 		}
 	]
