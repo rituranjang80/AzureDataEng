@@ -44,6 +44,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'OnPremiseSqlServerJatin'"
 		},
+		"PII_POC_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'PII_POC'"
+		},
 		"SqlServer1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SqlServer1'"
@@ -81,6 +85,10 @@
 			"type": "string",
 			"defaultValue": "rituranjang@audaxlabs.com"
 		},
+		"PII_POC_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://dldemoaccount.dfs.core.windows.net/"
+		},
 		"RestService2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://reqres.in/api/users/"
@@ -108,22 +116,6 @@
 		"synapse-audax-demo-ws-livewire-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://dldemoaccount.dfs.core.windows.net"
-		},
-		"eventTrigger_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/422cf0b3-8d06-4fc7-8903-2cb72dd00d8f/resourceGroups/Livewire/providers/Microsoft.Storage/storageAccounts/dldemoaccount"
-		},
-		"eventtigger_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/422cf0b3-8d06-4fc7-8903-2cb72dd00d8f/resourceGroups/Livewire/providers/Microsoft.Storage/storageAccounts/dldemoaccount"
-		},
-		"tumblingWindowTrigger_properties_pipeline_parameters_pstartdate": {
-			"type": "string",
-			"defaultValue": "@trigger().outputs.windowStartTime"
-		},
-		"tumblingWindowTrigger_properties_pipeline_parameters_penddate": {
-			"type": "string",
-			"defaultValue": "@trigger().outputs.windowEndTime"
 		}
 	},
 	"variables": {
@@ -4000,6 +3992,29 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/PII_POC')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('PII_POC_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('PII_POC_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/PowerBIWorkspace1')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -4265,70 +4280,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/eventTrigger')]",
-			"type": "Microsoft.Synapse/workspaces/triggers",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "eventTrigger",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/dldemofilesystem/blobs/MLdata/Input/",
-					"blobPathEndsWith": ".csv",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('eventTrigger_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobDeleted",
-						"Microsoft.Storage.BlobCreated"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/pipelines/eventTrigger')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/eventtigger')]",
-			"type": "Microsoft.Synapse/workspaces/triggers",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "eventTigger2",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/dldemofilesystem/blobs/MLdata/Input/",
-					"blobPathEndsWith": ".csv",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('eventtigger_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated",
-						"Microsoft.Storage.BlobDeleted"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/pipelines/eventTigger2')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/scheduleTigger')]",
 			"type": "Microsoft.Synapse/workspaces/triggers",
 			"apiVersion": "2019-06-01-preview",
@@ -4356,41 +4307,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/pipelines/eventTigger2')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/tumblingWindowTrigger')]",
-			"type": "Microsoft.Synapse/workspaces/triggers",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipeline": {
-					"pipelineReference": {
-						"referenceName": "Pipeline 1",
-						"type": "PipelineReference"
-					},
-					"parameters": {
-						"pstartdate": "[parameters('tumblingWindowTrigger_properties_pipeline_parameters_pstartdate')]",
-						"penddate": "[parameters('tumblingWindowTrigger_properties_pipeline_parameters_penddate')]"
-					}
-				},
-				"type": "TumblingWindowTrigger",
-				"typeProperties": {
-					"frequency": "Hour",
-					"interval": 24,
-					"startTime": "2021-08-01T00:00:00Z",
-					"endTime": "2021-08-08T23:59:00Z",
-					"delay": "00:00:00",
-					"maxConcurrency": 50,
-					"retryPolicy": {
-						"intervalInSeconds": 30
-					},
-					"dependsOn": []
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/pipelines/Pipeline 1')]"
 			]
 		},
 		{

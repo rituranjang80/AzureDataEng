@@ -32,6 +32,9 @@
 		"OnPremiseSqlServerJatin_connectionString": {
 			"value": ""
 		},
+		"PII_POC_accountKey": {
+			"value": ""
+		},
 		"SqlServer1_connectionString": {
 			"value": ""
 		},
@@ -59,6 +62,9 @@
 		"FileServer1_properties_typeProperties_userId": {
 			"value": "rituranjang@audaxlabs.com"
 		},
+		"PII_POC_properties_typeProperties_url": {
+			"value": "https://dldemoaccount.dfs.core.windows.net/"
+		},
 		"RestService2_properties_typeProperties_url": {
 			"value": "https://reqres.in/api/users/"
 		},
@@ -79,18 +85,6 @@
 		},
 		"synapse-audax-demo-ws-livewire-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://dldemoaccount.dfs.core.windows.net"
-		},
-		"eventTrigger_properties_typeProperties_scope": {
-			"value": "/subscriptions/422cf0b3-8d06-4fc7-8903-2cb72dd00d8f/resourceGroups/Livewire/providers/Microsoft.Storage/storageAccounts/dldemoaccount"
-		},
-		"eventtigger_properties_typeProperties_scope": {
-			"value": "/subscriptions/422cf0b3-8d06-4fc7-8903-2cb72dd00d8f/resourceGroups/Livewire/providers/Microsoft.Storage/storageAccounts/dldemoaccount"
-		},
-		"tumblingWindowTrigger_properties_pipeline_parameters_pstartdate": {
-			"value": "@trigger().outputs.windowStartTime"
-		},
-		"tumblingWindowTrigger_properties_pipeline_parameters_penddate": {
-			"value": "@trigger().outputs.windowEndTime"
 		}
 	}
 }
