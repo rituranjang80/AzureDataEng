@@ -3518,6 +3518,100 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/PII_POC_CSV')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "PII_POC",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "PII_Sample_Data.csv",
+						"folderPath": "PII_Data_Masking_Input",
+						"fileSystem": "input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "gender",
+						"type": "String"
+					},
+					{
+						"name": "birthdate",
+						"type": "String"
+					},
+					{
+						"name": "maiden_name",
+						"type": "String"
+					},
+					{
+						"name": "lname",
+						"type": "String"
+					},
+					{
+						"name": "fname",
+						"type": "String"
+					},
+					{
+						"name": "address",
+						"type": "String"
+					},
+					{
+						"name": "city",
+						"type": "String"
+					},
+					{
+						"name": "state",
+						"type": "String"
+					},
+					{
+						"name": "zip",
+						"type": "String"
+					},
+					{
+						"name": "phone",
+						"type": "String"
+					},
+					{
+						"name": "email",
+						"type": "String"
+					},
+					{
+						"name": "cc_type",
+						"type": "String"
+					},
+					{
+						"name": "cc_number",
+						"type": "String"
+					},
+					{
+						"name": "cc_cvc",
+						"type": "String"
+					},
+					{
+						"name": "cc_expiredate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/PII_POC')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/QualityDataOutput')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -4541,6 +4635,79 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/PII_Dataflow')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "PII_POC_CSV",
+								"type": "DatasetReference"
+							},
+							"name": "PIISampleSource"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "AzureSqlTable",
+								"type": "DatasetReference"
+							},
+							"name": "DumpInAzureSQLTable"
+						}
+					],
+					"transformations": [
+						{
+							"name": "maskColumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          id as string,",
+						"          gender as string,",
+						"          birthdate as string,",
+						"          maiden_name as string,",
+						"          lname as string,",
+						"          fname as string,",
+						"          address as string,",
+						"          city as string,",
+						"          state as string,",
+						"          zip as string,",
+						"          phone as string,",
+						"          email as string,",
+						"          cc_type as string,",
+						"          cc_number as string,",
+						"          cc_cvc as string,",
+						"          cc_expiredate as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> PIISampleSource",
+						"PIISampleSource derive(phone = crc32(256, phone),",
+						"          email = regexReplace(email, '^.{1}(.+).{1}$', 'xxx'),",
+						"          cc_number = sha2(256, cc_number)) ~> maskColumns",
+						"maskColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> DumpInAzureSQLTable"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/PII_POC_CSV')]",
+				"[concat(variables('workspaceId'), '/datasets/AzureSqlTable')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/PhoneValidationDataflow')]",
 			"type": "Microsoft.Synapse/workspaces/dataflows",
 			"apiVersion": "2019-06-01-preview",
@@ -5120,170 +5287,69 @@
 			"location": "centralus"
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/PII_POC_CSV')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
+			"name": "[concat(parameters('workspaceName'), '/PIIPocCsvPipeline')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
-				"linkedServiceName": {
-					"referenceName": "PII_POC",
-					"type": "LinkedServiceReference"
+				"activities": [
+					{
+						"name": "PIIDataFlow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "PII_Dataflow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"PIISampleSource": {},
+									"DumpInAzureSQLTable": {
+										"schema": {
+											"value": "@pipeline().parameters.schema",
+											"type": "Expression"
+										},
+										"destTableName": {
+											"value": "@pipeline().parameters.destinationTable",
+											"type": "Expression"
+										}
+									}
+								},
+								"linkedServiceParameters": {}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
 				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "PII_Sample_Data.csv",
-						"folderPath": "PII_Data_Masking_Input",
-						"fileSystem": "input"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "id",
+				"parameters": {
+					"schema": {
 						"type": "String"
 					},
-					{
-						"name": "gender",
-						"type": "String"
-					},
-					{
-						"name": "birthdate",
-						"type": "String"
-					},
-					{
-						"name": "maiden_name",
-						"type": "String"
-					},
-					{
-						"name": "lname",
-						"type": "String"
-					},
-					{
-						"name": "fname",
-						"type": "String"
-					},
-					{
-						"name": "address",
-						"type": "String"
-					},
-					{
-						"name": "city",
-						"type": "String"
-					},
-					{
-						"name": "state",
-						"type": "String"
-					},
-					{
-						"name": "zip",
-						"type": "String"
-					},
-					{
-						"name": "phone",
-						"type": "String"
-					},
-					{
-						"name": "email",
-						"type": "String"
-					},
-					{
-						"name": "cc_type",
-						"type": "String"
-					},
-					{
-						"name": "cc_number",
-						"type": "String"
-					},
-					{
-						"name": "cc_cvc",
-						"type": "String"
-					},
-					{
-						"name": "cc_expiredate",
+					"destinationTable": {
 						"type": "String"
 					}
-				]
+				},
+				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/PII_POC')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/PII_Dataflow')]",
-			"type": "Microsoft.Synapse/workspaces/dataflows",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "PII_POC_CSV",
-								"type": "DatasetReference"
-							},
-							"name": "PIISampleSource"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "AzureSqlTable",
-								"type": "DatasetReference"
-							},
-							"name": "DumpInAzureSQLTable"
-						}
-					],
-					"transformations": [
-						{
-							"name": "maskColumns"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          id as string,",
-						"          gender as string,",
-						"          birthdate as string,",
-						"          maiden_name as string,",
-						"          lname as string,",
-						"          fname as string,",
-						"          address as string,",
-						"          city as string,",
-						"          state as string,",
-						"          zip as string,",
-						"          phone as string,",
-						"          email as string,",
-						"          cc_type as string,",
-						"          cc_number as string,",
-						"          cc_cvc as string,",
-						"          cc_expiredate as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> PIISampleSource",
-						"PIISampleSource derive(phone = crc32(256, phone),",
-						"          email = regexReplace(email, '^.{1}(.+).{1}$', 'xxx'),",
-						"          cc_number = sha2(256, cc_number)) ~> maskColumns",
-						"maskColumns sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> DumpInAzureSQLTable"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/datasets/PII_POC_CSV')]",
-				"[concat(variables('workspaceId'), '/datasets/AzureSqlTable')]"
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('workspaceId'), '/dataflows/PII_Dataflow')]"
 			]
 		}
 	]
