@@ -5212,6 +5212,79 @@
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/PII_POC')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/PII_Dataflow')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "PII_POC_CSV",
+								"type": "DatasetReference"
+							},
+							"name": "PIISampleSource"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "AzureSqlTable",
+								"type": "DatasetReference"
+							},
+							"name": "DumpInAzureSQLTable"
+						}
+					],
+					"transformations": [
+						{
+							"name": "maskColumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          id as string,",
+						"          gender as string,",
+						"          birthdate as string,",
+						"          maiden_name as string,",
+						"          lname as string,",
+						"          fname as string,",
+						"          address as string,",
+						"          city as string,",
+						"          state as string,",
+						"          zip as string,",
+						"          phone as string,",
+						"          email as string,",
+						"          cc_type as string,",
+						"          cc_number as string,",
+						"          cc_cvc as string,",
+						"          cc_expiredate as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> PIISampleSource",
+						"PIISampleSource derive(phone = crc32(256, phone),",
+						"          email = regexReplace(email, '^.{1}(.+).{1}$', 'xxx'),",
+						"          cc_number = sha2(256, cc_number)) ~> maskColumns",
+						"maskColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> DumpInAzureSQLTable"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/PII_POC_CSV')]",
+				"[concat(variables('workspaceId'), '/datasets/AzureSqlTable')]"
+			]
 		}
 	]
 }
