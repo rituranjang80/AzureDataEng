@@ -41,6 +41,9 @@
 		"SqlServer2_connectionString": {
 			"value": ""
 		},
+		"SqlServer3Ritu_connectionString": {
+			"value": ""
+		},
 		"synapse-audax-demo-ws-livewire-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-audax-demo-ws-livewire.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
@@ -85,6 +88,12 @@
 		},
 		"synapse-audax-demo-ws-livewire-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://dldemoaccount.dfs.core.windows.net"
+		},
+		"TumblingTigger_properties_pipeline_parameters_PstartDate": {
+			"value": "@trigger().outputs.windowStartTime"
+		},
+		"TumblingTigger_properties_pipeline_parameters_PendDate": {
+			"value": "@trigger().outputs.windowEndTime"
 		}
 	}
 }

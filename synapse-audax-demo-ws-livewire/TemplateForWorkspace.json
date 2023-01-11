@@ -56,6 +56,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SqlServer2'"
 		},
+		"SqlServer3Ritu_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SqlServer3Ritu'"
+		},
 		"synapse-audax-demo-ws-livewire-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'synapse-audax-demo-ws-livewire-WorkspaceDefaultSqlServer'",
@@ -116,6 +120,14 @@
 		"synapse-audax-demo-ws-livewire-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://dldemoaccount.dfs.core.windows.net"
+		},
+		"TumblingTigger_properties_pipeline_parameters_PstartDate": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowStartTime"
+		},
+		"TumblingTigger_properties_pipeline_parameters_PendDate": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowEndTime"
 		}
 	},
 	"variables": {
@@ -1282,6 +1294,70 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/PIIPocCsvPipeline')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "PIIDataFlow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "PII_Dataflow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"PIISampleSource": {},
+									"DumpInAzureSQLTable": {
+										"schema": {
+											"value": "@pipeline().parameters.schema",
+											"type": "Expression"
+										},
+										"destTableName": {
+											"value": "@pipeline().parameters.destinationTable",
+											"type": "Expression"
+										}
+									}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"schema": {
+						"type": "String"
+					},
+					"destinationTable": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/PII_Dataflow')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/PhoneNumberValidationPipeline')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -1738,6 +1814,97 @@
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/notebooks/parameterPipeline')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/apachesparkpool')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/TumblingTigger2')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": "[dbo].[prc_LoadCustomer]",
+								"storedProcedureParameters": {
+									"enddate": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.PendDate",
+											"type": "Expression"
+										}
+									},
+									"startdate": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.PstartDate",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "SqlServerSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SqlServerTable1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SqlServerTable2",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"PstartDate": {
+						"type": "string"
+					},
+					"PendDate": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/SqlServerTable1')]",
+				"[concat(variables('workspaceId'), '/datasets/SqlServerTable2')]"
 			]
 		},
 		{
@@ -3693,6 +3860,45 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SqlServerTable1')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServer3Ritu",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/SqlServer3Ritu')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SqlServerTable2')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServer3Ritu",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DestinationCustomer"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/SqlServer3Ritu')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/SqlServerTabletriggerDest')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -4301,6 +4507,25 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SqlServer3Ritu')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('SqlServer3Ritu_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "IntegrationRuntime1SQL",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/IntegrationRuntime1SQL')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/synapse-audax-demo-ws-livewire-WorkspaceDefaultSqlServer')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -4374,6 +4599,41 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/TumblingTigger')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "TumblingTigger2",
+						"type": "PipelineReference"
+					},
+					"parameters": {
+						"PstartDate": "[parameters('TumblingTigger_properties_pipeline_parameters_PstartDate')]",
+						"PendDate": "[parameters('TumblingTigger_properties_pipeline_parameters_PendDate')]"
+					}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Hour",
+					"interval": 24,
+					"startTime": "2021-08-03T00:00:00Z",
+					"endTime": "2021-08-05T00:00:00Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/TumblingTigger2')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/scheduleTigger')]",
 			"type": "Microsoft.Synapse/workspaces/triggers",
 			"apiVersion": "2019-06-01-preview",
@@ -4419,6 +4679,16 @@
 						}
 					}
 				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/IntegrationRuntime1SQL')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
 			},
 			"dependsOn": []
 		},
@@ -5285,72 +5555,6 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/PIIPocCsvPipeline')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"activities": [
-					{
-						"name": "PIIDataFlow",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "PII_Dataflow",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"PIISampleSource": {},
-									"DumpInAzureSQLTable": {
-										"schema": {
-											"value": "@pipeline().parameters.schema",
-											"type": "Expression"
-										},
-										"destTableName": {
-											"value": "@pipeline().parameters.destinationTable",
-											"type": "Expression"
-										}
-									}
-								},
-								"linkedServiceParameters": {}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"parameters": {
-					"schema": {
-						"type": "String"
-					},
-					"destinationTable": {
-						"type": "String"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
-				"[concat(variables('workspaceId'), '/dataflows/PII_Dataflow')]"
-			]
 		}
 	]
 }
